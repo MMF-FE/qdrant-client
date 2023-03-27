@@ -31,4 +31,4 @@ jobs:
             - run: yarn build
             - run: npm --no-git-tag-version version ${GITHUB_REF#refs/tags/}
             - run: npm publish
-            - run: CI_TOKEN=$CI_FE_TOKEN yarn docs:build
+            # - run: CI_TOKEN=$CI_FE_TOKEN yarn docs:build
