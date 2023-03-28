@@ -2,13 +2,13 @@ import { request, HttpMethod } from 'urllib'
 
 const baseUrl = 'http://localhost:6333'
 
-interface IPoint {
+export interface IPoint {
     id: number | string
     vector: number[]
     payload?: any
 }
 
-interface IQuery {
+export interface IQuery {
     params?: {
         hnsw_ef?: number
         exact?: boolean
