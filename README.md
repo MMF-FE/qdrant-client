@@ -23,6 +23,13 @@ const schema: VectorParams = {
 }
 
 const client = await useQdrant(name, schema, 'http://localhost:6333')
+// or set apikey
+// const client = await useQdrant(name, schema, 'http://localhost:6333', {
+//     headers: {
+//         'api-key': 'xxx'
+//     }
+// })
+
 
 /**
  * add or edit

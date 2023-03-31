@@ -1,4 +1,4 @@
-import { request, HttpMethod } from 'urllib'
+import { request, HttpMethod, RequestOptions } from 'urllib'
 
 const baseUrl = 'http://localhost:6333'
 
@@ -42,7 +42,8 @@ export interface SearchResult {
 export async function qdrantRequest<T>(
     url: string,
     data?: any,
-    method: HttpMethod = 'POST'
+    method: HttpMethod = 'POST',
+    options: RequestOptions = {}
 ) {
     const res = await request<{
         result?: T
@@ -51,6 +52,7 @@ export async function qdrantRequest<T>(
         }
         time: number
     }>(url, {
+        ...options,
         method,
         contentType: 'json',
         dataType: 'json',
@@ -71,7 +73,8 @@ export async function qdrantRequest<T>(
 export default async function useCollection(
     name: string,
     body: VectorParams,
-    host?: string
+    host?: string,
+    reqOptions: RequestOptions = {}
 ) {
     host = host || baseUrl
     if (host && !host.endsWith('/')) {
@@ -83,12 +86,12 @@ export default async function useCollection(
         return qdrantRequest<{
             status: 'ok' | 'completed'
             time?: number
-        }>(url, null, 'GET')
+        }>(url, null, 'GET', reqOptions)
     }
 
     const createCollection = async () => {
         const url = `${host}collections/${name}`
-        return qdrantRequest<boolean>(url, body, 'PUT')
+        return qdrantRequest<boolean>(url, body, 'PUT', reqOptions)
     }
 
     /**
@@ -124,7 +127,8 @@ export default async function useCollection(
         const { error, result } = await qdrantRequest<SearchResult[]>(
             url,
             query,
-            'POST'
+            'POST',
+            reqOptions
         )
         if (error) {
             throw new Error(error)
@@ -142,7 +146,7 @@ export default async function useCollection(
         const { error, result } = await qdrantRequest<{
             status: 'ok' | 'completed'
             time?: number
-        }>(url, { points }, 'PUT')
+        }>(url, { points }, 'PUT', reqOptions)
 
         if (error) {
             throw new Error(error)
@@ -155,7 +159,8 @@ export default async function useCollection(
         const { error, result } = await qdrantRequest<IPoint>(
             url,
             undefined,
-            'GET'
+            'GET',
+            reqOptions
         )
 
         if (error) {
@@ -176,7 +181,8 @@ export default async function useCollection(
             {
                 points: ids,
             },
-            'POST'
+            'POST',
+            reqOptions
         )
 
         if (error) {
@@ -190,7 +196,8 @@ export default async function useCollection(
         const { error, result } = await qdrantRequest<IPoint[]>(
             url,
             { ids, with_payload: true, with_vector: true },
-            'POST'
+            'POST',
+            reqOptions
         )
 
         if (error) {
@@ -201,7 +208,12 @@ export default async function useCollection(
 
     const clear = async () => {
         const url = `${host}collections/${name}`
-        const { error, result } = await qdrantRequest(url, null, 'DELETE')
+        const { error, result } = await qdrantRequest(
+            url,
+            null,
+            'DELETE',
+            reqOptions
+        )
 
         if (error) {
             throw new Error(error)
